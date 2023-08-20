@@ -1,7 +1,10 @@
+
 REQ: Create a query to return a list of algorithms and their volumes for each quarter of 2020.
 Result format: Algorithm name, q1, q2, q3, q4 transactions (5 cols total)
 +Q1 thru Q4 contain sums of transaction vol for each calendar quarter 2020, precise to 6 places after decimal
 +Results should be sorted ascending by algorithm name
+
+--Ollie
 
 SET NOCOUNT ON;
 WITH quarterly_volume as (
