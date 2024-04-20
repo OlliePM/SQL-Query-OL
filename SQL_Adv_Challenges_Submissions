@@ -1,0 +1,38 @@
+--Problem questions: Write a query to retrieve the contest ID, hacker ID, name, and the total counts of submissions, accepted submissions, views, and unique views for each contest. Sort the results by contest ID. 
+--Exclude contests where all four counts are zero. Additionally, note that each college may utilize a specific contest to assess candidates, but each college holds only one screening contest.
+--Compatible with Microsoft SQL Server 
+
+
+SELECT CON.contest_id
+    ,CON.hacker_id
+    ,CON.name
+    ,total_submis = SUM(total_submissions)
+    ,total_accepted_submis = SUM(total_accepted_submissions)
+    ,total_views = SUM(total_views)
+    ,total_unique_views = SUM(total_unique_views)
+FROM contests CON
+JOIN colleges COL ON CON.contest_id = COL.contest_id
+JOIN challenges CHA ON COL.college_id = CHA.college_id
+LEFT JOIN (
+    SELECT challenge_id
+        ,total_views = SUM(total_views)
+        ,total_unique_views = SUM(total_unique_views)
+    FROM view_stats
+    GROUP BY challenge_id
+    ) VS ON CHA.challenge_id = VS.challenge_id
+LEFT JOIN (
+    SELECT challenge_id
+        ,total_submissions = SUM(total_submissions)
+        ,total_accepted_submissions = SUM(total_accepted_submissions)
+    FROM submission_stats
+    GROUP BY challenge_id
+    ) SS ON CHA.challenge_id = SS.challenge_id
+GROUP BY CON.contest_id
+    ,CON.hacker_id
+    ,CON.name
+HAVING SUM(total_submissions) <> 0
+    OR SUM(total_accepted_submissions) <> 0
+    OR SUM(total_views) <> 0
+    OR SUM(total_unique_views) <> 0
+ORDER BY contest_id;
+
